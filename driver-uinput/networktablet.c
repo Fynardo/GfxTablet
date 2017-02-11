@@ -145,28 +145,30 @@ int main(void)
 		send_event(device, EV_ABS, ABS_Y, ev_pkt.y);
 		send_event(device, EV_ABS, ABS_PRESSURE, ev_pkt.pressure);
 
-		switch (ev_pkt.type) {
-			case EVENT_TYPE_MOTION:
-				send_event(device, EV_SYN, SYN_REPORT, 1);
-				break;
-			case EVENT_TYPE_BUTTON:
-				// stylus hovering
-				if (ev_pkt.button == -1)
-					send_event(device, EV_KEY, BTN_TOOL_PEN, ev_pkt.down);
-				// stylus touching
-				if (ev_pkt.button == 0)
-					send_event(device, EV_KEY, BTN_TOUCH, ev_pkt.down);
-				// button 1
-				if (ev_pkt.button == 1)
-					send_event(device, EV_KEY, BTN_STYLUS, ev_pkt.down);
-				// button 2
-				if (ev_pkt.button == 2)
-					send_event(device, EV_KEY, BTN_STYLUS2, ev_pkt.down);
-				printf("sent button: %hhi, %hhu\n", ev_pkt.button, ev_pkt.down);
-				send_event(device, EV_SYN, SYN_REPORT, 1);
-				break;
+        
+         if (ev_pkt.pressure < 4000)
+             send_event(device, EV_KEY, BTN_TOUCH, 0);
+         if (ev_pkt.pressure > 4500)
+             send_event(device, EV_KEY, BTN_TOUCH, 1);
 
-		}
+        send_event(device, EV_SYN, SYN_REPORT, 1);
+        
+// 		switch (ev_pkt.type) {
+// 			case EVENT_TYPE_MOTION:
+// 				send_event(device, EV_SYN, SYN_REPORT, 1);
+// 				break;
+// 			case EVENT_TYPE_BUTTON:
+// 				// stylus hovering
+// 				if (ev_pkt.button == -1)
+//                     send_event(device, EV_KEY, BTN_TOOL_PEN, ev_pkt.down);
+// 				// stylus touching
+// 				if (ev_pkt.button == 0)
+// 					send_event(device, EV_KEY, BTN_TOUCH, ev_pkt.down);
+// 
+//                 printf("sent button: %hhi, %hhu\n", ev_pkt.button, ev_pkt.down);
+// 				send_event(device, EV_SYN, SYN_REPORT, 1);
+// 				break;
+// 		}
 	}
 	close(udp_socket);
 
